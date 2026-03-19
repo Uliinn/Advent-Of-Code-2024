@@ -23,8 +23,11 @@ with open("input.txt","r") as f:
 
     positions = freq_map[symbol]
 
+    if len(positions) <= 1: continue # If only one of freq, then no antinodes
+
     for i in range(len(positions)):
       pos1 = positions[i]
+      antinodes.add(pos1)
       for j in range(i+1,len(positions)):
         pos2 = positions[j]
 
@@ -33,17 +36,17 @@ with open("input.txt","r") as f:
         # 2 possible antinodes per pair of points
         # one at pos1 + 2 * vec, and one at pos1 - vec
 
-        antinode1 = (pos1[0] + 2 * vec[0], pos1[1] + 2 * vec[1])
+        # Here pos1 + vec * n
+        possible_antinode = (pos1[0] + vec[0], pos1[1] + vec[1])
+        while 0 <= possible_antinode[0] < height and 0 <= possible_antinode[1] < width:
+          antinodes.add(possible_antinode)
+          possible_antinode = (possible_antinode[0] + vec[0], possible_antinode[1] + vec[1])
 
-        if 0 <= antinode1[0] < height and 0 <= antinode1[1] < width:
-          if antinode1 not in antinodes:
-            antinodes.add(antinode1)
+        possible_antinode = (pos1[0] - vec[0], pos1[1] - vec[1])
 
-        antinode2 = (pos1[0] - vec[0], pos1[1] - vec[1])
-
-        if 0 <= antinode2[0] < height and 0 <= antinode2[1] < width:
-          if antinode2 not in antinodes:
-            antinodes.add(antinode2)
+        while 0 <= possible_antinode[0] < height and 0 <= possible_antinode[1] < width:
+          antinodes.add(possible_antinode)
+          possible_antinode = (possible_antinode[0] - vec[0], possible_antinode[1] - vec[1])
         
 
   print(len(antinodes))
