@@ -1,8 +1,6 @@
 
 
 # Just add 10000000000000 to the answer
-from z3 import Ints, Solver, sat
-
 total = 0
 with open("input.txt","r") as f:
   inp = list(filter(lambda x: x != '\n',f.readlines()))
@@ -23,17 +21,18 @@ with open("input.txt","r") as f:
 
     ax, ay = int(ax), int(ay)
     bx, by = int(bx), int(by)
-    px, py = int(px), int(py)
+    px, py = int(px)+10000000000000, int(py)+10000000000000
 
-    solver = Solver()
-    a,b = Ints("a b")
+    det = (ax*by - bx*ay)
+    if det == 0:
+      i += 3
+      continue # not possible
 
-    solver.add(a * ax + b * bx == px + 10000000000000)
-    solver.add(a * ay + b * by == py + 10000000000000)
-
-    if solver.check() == sat:
-      answer = solver.model()
-      total += 3* answer[a].as_long() + answer[b].as_long()
+    a = (by*px - bx*py) / det
+    b = (-ay*px + ax*py) / det
+    
+    if a.is_integer() and b.is_integer():
+      total += 3*int(a) + int(b)
     
     i += 3
 print(total)

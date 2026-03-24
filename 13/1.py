@@ -5,7 +5,15 @@
 
 # a*v.x + b*s.x = x
 # a*v.y + b.s.y = y
-from z3 import Ints, Solver, sat
+
+
+# [v s] [A B]^T = P
+# [A B]^T = [v s]^-1 P
+# 
+# [v s] = [[vx sx]
+#          [vy sy]] 
+# [v s]^-1 = 1/(vx*sy -sx*vy) [[sy -sx]
+#                              [-vy vx]]
 
 total = 0
 with open("input.txt","r") as f:
@@ -29,17 +37,19 @@ with open("input.txt","r") as f:
     bx, by = int(bx), int(by)
     px, py = int(px), int(py)
 
-    solver = Solver()
-    a,b = Ints("a b")
+    det = (ax*by - bx*ay)
+    if det == 0:
+      i += 3
+      continue # not possible
 
-    solver.add(a * ax + b * bx == px)
-    solver.add(a * ay + b * by == py)
-
-    if solver.check() == sat:
-      answer = solver.model()
-      total += 3* answer[a].as_long() + answer[b].as_long()
+    a = (by*px - bx*py) / det
+    b = (-ay*px + ax*py) / det
+    
+    if a.is_integer() and b.is_integer():
+      total += 3*int(a) + int(b)
     
     i += 3
 print(total)
+
     
 
