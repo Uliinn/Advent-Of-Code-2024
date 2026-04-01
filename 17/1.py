@@ -31,9 +31,7 @@ def get_combo_operand(code):
 
 pointer = 0
 output = []
-i = 0
 while pointer < len(program):
-  i += 1
   opcode = program[pointer]
 
   match opcode:
