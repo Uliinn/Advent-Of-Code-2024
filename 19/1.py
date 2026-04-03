@@ -3,41 +3,27 @@ with open("input.txt","r") as f:
 
   available = list(map(lambda x: x.strip(","),inp[0].split())) # Available towels
 
-  patterns = [list(v.strip()) for v in inp[2:]]
+  patterns = [v.strip() for v in inp[2:]]
 
+from functools import lru_cache
 
-
-
-def recursive_is_possible(pattern,towels) -> bool:
-  cache = {}
-  def _is_possible(pattern,towels,index) -> bool:
+def is_possible(pattern, towels):
     
-    if index == len(pattern):
-      return True
+    @lru_cache(maxsize=None)
+    def dfs(remaining):
+        if remaining == "":
+            return True
+        
+        for towel in towels:
+            if remaining.startswith(towel):
+                if dfs(remaining[len(towel):]):
+                   return True
+        return False
+    
+    return dfs(pattern)
 
-    for towel in towels:
-      if (index,towel) in cache:
-        return cache[index,towel] 
-      if index + len(towel) > len(pattern): # Towel too long
-        continue
-
-      condition = True
-      for i,s in enumerate(pattern[index:index + len(towel)]):
-        if s != towel[i]:
-          condition = False 
-          break
-      if condition:
-        cache[index,towel] = True
-        if _is_possible(pattern,towels,index + len(towel)):
-          return True
-      else:
-        cache[index,towel] = False
-    return False
-
-  return _is_possible(pattern,towels,0)
 
 possible = 0 
 for pattern in patterns:
-  if recursive_is_possible(pattern,available):
-    possible += 1
+  possible += is_possible(pattern,available)
 print(possible)
