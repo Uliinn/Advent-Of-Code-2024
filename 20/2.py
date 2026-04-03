@@ -1,4 +1,4 @@
-
+import numpy as np
 
 WALL = -1
 with open("input.txt","r") as f:
@@ -42,25 +42,30 @@ seconds_array[start[1]][start[0]] = time # Last step that doesnt get covered by 
 WIDTH = len(grid[0])
 HEIGHT = len(grid)
 
+
+
+sa = np.array(seconds_array)  # konvertera en gång innan loopen
+
 at_least_100 = 0
-for x,y in all_free_spaces:
+cheat_length = 20
 
-  time = seconds_array[y][x]
+for x, y in all_free_spaces:
+    t = sa[y, x]
+    if t == 0 and (x, y) != end:
+        continue
 
-  cheat_length = 20
+    # Cut out a window around (x,y)
+    x0, x1 = max(0, x - cheat_length), min(WIDTH, x + cheat_length + 1)
+    y0, y1 = max(0, y - cheat_length), min(HEIGHT, y + cheat_length + 1)
 
-  for dx in range(-cheat_length, cheat_length + 1):
-      for dy in range(-(cheat_length - abs(dx)), (cheat_length - abs(dx)) + 1):
-          dist = abs(dx) + abs(dy)
-          if dist < 2: # Cant be less than 2 steps
-              continue
-          xi, yi = x + dx, y + dy
-          if not ((0 <= xi < WIDTH) and (0 <= yi < HEIGHT)):
-              continue
-          new_time = seconds_array[yi][xi]
-          if new_time == WALL:
-              continue
-          if time - (new_time + dist) >= 100:
-              at_least_100 += 1
+    window = sa[y0:y1, x0:x1]
+
+    # Manhattan-distance for every cell in the window
+    ys, xs = np.ogrid[y0-y:y1-y, x0-x:x1-x]
+    dist = np.abs(xs) + np.abs(ys)
+
+    mask = (dist >= 2) & (dist <= cheat_length) & (window != WALL)
+    savings = t - (window + dist)
+    at_least_100 += np.sum((savings >= 100) & mask)
 
 print(at_least_100)
