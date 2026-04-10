@@ -44,10 +44,10 @@ for i in range(1, highest_zs):
     xi = f"x{i:02d}"
     yi = f"y{i:02d}"
     
-    # Half ader: xi XOR yi
+    # Half adder: xi XOR yi
     half_sum = find_gate("XOR", xi, yi)
     
-    # Förväntad z: half_sum XOR carry
+    # expceted z: half_sum XOR carry
     z = f"z{i:02d}"
     expected_z = find_gate("XOR", half_sum, carry)
     
@@ -61,7 +61,7 @@ for i in range(1, highest_zs):
                 # One of the inputs are wrong, swap the one that is not carry or half_sum
                 wrong = zx1 if zx2 in (half_sum, carry) else zx2
                 correct = carry if zx2 == half_sum else half_sum
-                # Hitta vad wrong egentligen borde vara
+                # Find what wrong really should be
                 swap_wires(wrong, correct)
                 expected_z = z
     elif expected_z != z:
